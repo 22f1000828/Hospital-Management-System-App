@@ -42,7 +42,7 @@ sudo apt-get install redis-server
 redis-server
 ```
 
-5. Start MailHog for email testing (optional):
+5. Start MailHog for email testing :
 
 ```bash
 wget https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64
