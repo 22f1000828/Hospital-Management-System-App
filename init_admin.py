@@ -9,7 +9,7 @@ def init_db():
         # Create all tables
         db.create_all()
         
-        # Check if admin already exists
+        # Check if admin already exists or not
         admin = User.query.filter_by(role='Admin').first()
         if admin:
             print(f"Admin user already exists: {admin.username}")
