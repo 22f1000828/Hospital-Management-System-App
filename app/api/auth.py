@@ -81,15 +81,23 @@ class Register(Resource):
         db.session.add(user)
         db.session.flush()
         
+        from datetime import datetime as dt
+        dob = None
+        if date_of_birth:
+            try:
+                dob = dt.strptime(date_of_birth, '%Y-%m-%d').date()
+            except:
+                pass
+        
         patient = Patient(
             user_id=user.id,
             first_name=first_name,
             last_name=last_name,
             phone=phone,
-            date_of_birth=date_of_birth,
+            date_of_birth=dob,
             address=address,
-            emergency_contact_name=emergency_contact_name,
-            emergency_contact_phone=emergency_contact_phone,
+            emergency_contact=emergency_contact_name,
+            emergency_phone=emergency_contact_phone,
             is_active=True
         )
         db.session.add(patient)

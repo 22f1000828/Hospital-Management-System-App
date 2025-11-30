@@ -167,12 +167,14 @@ class AdminDoctor(Resource):
             'doctor': serialize_doctor(doctor)
         }
 
-class AdminDoctorDeactivate(Resource):
+class AdminDoctorDelete(Resource):
     @admin_required_api
-    def post(self, doctor_id):
+    def delete(self, doctor_id):
         doctor = Doctor.query.get_or_404(doctor_id)
-        doctor.is_active = False
-        doctor.user.is_active = False
+        user = doctor.user
+        db.session.delete(doctor)
+        if user:
+            db.session.delete(user)
         db.session.commit()
         
         return {'success': True}
@@ -202,13 +204,17 @@ class AdminPatients(Resource):
             'patients': [serialize_patient(p) for p in patients_list]
         }
 
-class AdminPatientDeactivate(Resource):
+class AdminPatientDelete(Resource):
     @admin_required_api
-    def post(self, patient_id):
+    def delete(self, patient_id):
         patient = Patient.query.get_or_404(patient_id)
-        patient.is_active = False
-        patient.user.is_active = False
+        user = patient.user
+        db.session.delete(patient)
+        if user:
+            db.session.delete(user)
         db.session.commit()
+        
+        cache.delete('admin_patient_search_')
         
         return {'success': True}
 
@@ -264,8 +270,8 @@ class AdminPatientHistory(Resource):
 api.add_resource(AdminDashboard, '/admin/dashboard')
 api.add_resource(AdminDoctors, '/admin/doctors')
 api.add_resource(AdminDoctor, '/admin/doctors/<int:doctor_id>')
-api.add_resource(AdminDoctorDeactivate, '/admin/doctors/<int:doctor_id>/deactivate')
+api.add_resource(AdminDoctorDelete, '/admin/doctors/<int:doctor_id>')
 api.add_resource(AdminPatients, '/admin/patients')
-api.add_resource(AdminPatientDeactivate, '/admin/patients/<int:patient_id>/deactivate')
+api.add_resource(AdminPatientDelete, '/admin/patients/<int:patient_id>')
 api.add_resource(AdminAppointments, '/admin/appointments')
 api.add_resource(AdminPatientHistory, '/admin/patients/<int:patient_id>/history')

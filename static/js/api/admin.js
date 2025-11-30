@@ -18,8 +18,8 @@ const adminAPI = {
         return api.put(`/admin/doctors/${id}`, data);
     },
     
-    deactivateDoctor(id) {
-        return api.post(`/admin/doctors/${id}/deactivate`);
+    deleteDoctor(id) {
+        return api.delete(`/admin/doctors/${id}`);
     },
     
     getPatients(search = '') {
@@ -27,8 +27,8 @@ const adminAPI = {
         return api.get(`/admin/patients${params}`);
     },
     
-    deactivatePatient(id) {
-        return api.post(`/admin/patients/${id}/deactivate`);
+    deletePatient(id) {
+        return api.delete(`/admin/patients/${id}`);
     },
     
     getAppointments(search = '', status = '') {

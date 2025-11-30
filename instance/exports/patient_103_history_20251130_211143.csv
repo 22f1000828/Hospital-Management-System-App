@@ -1,0 +1,7 @@
+Appointment Date,Appointment Time,Doctor,Specialization,Status,Reason,Diagnosis,Prescription,Notes,Treatment Date
+2025-12-04,11:00,Emily Brown,Cardiology,Booked,heart,N/A,N/A,N/A,N/A
+2025-12-04,11:00,Amanda Davis,Cardiology,Booked,NA,N/A,N/A,N/A,N/A
+2025-12-02,16:00,Robert Miller,Cardiology,Booked,NA,N/A,N/A,N/A,N/A
+2025-11-25,09:00,James Wilson,Orthopedics,Cancelled,na,N/A,N/A,N/A,N/A
+2025-11-24,16:00,John Smit,Dermatology,Cancelled,nope,N/A,N/A,N/A,N/A
+2025-11-24,11:00,Ana anjali,Neurology,Cancelled,NA,N/A,N/A,N/A,N/A

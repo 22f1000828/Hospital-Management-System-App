@@ -99,14 +99,14 @@ const AdminDoctors = {
                 this.loading = false;
             }
         },
-        async deactivateDoctor(id) {
-            if (!confirm('Are you sure you want to deactivate this doctor?')) return;
+        async deleteDoctor(id) {
+            if (!confirm('Are you sure you want to delete this doctor? This action cannot be undone.')) return;
             try {
-                await adminAPI.deactivateDoctor(id);
-                window.appInstance.showSuccess('Doctor deactivated');
+                await adminAPI.deleteDoctor(id);
+                window.appInstance.showSuccess('Doctor deleted');
                 await this.loadDoctors();
             } catch (error) {
-                window.appInstance.showError('Failed to deactivate doctor');
+                window.appInstance.showError('Failed to delete doctor');
             }
         }
     },
@@ -161,7 +161,7 @@ const AdminDoctors = {
                             <td>{{ doctor.email }}</td>
                             <td>
                                 <router-link :to="'/admin/doctors/edit/' + doctor.id" class="btn btn-sm btn-primary me-2">Edit</router-link>
-                                <button @click="deactivateDoctor(doctor.id)" class="btn btn-sm btn-danger">Deactivate</button>
+                                <button @click="deleteDoctor(doctor.id)" class="btn btn-sm btn-danger">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -425,14 +425,14 @@ const AdminPatients = {
                 this.loading = false;
             }
         },
-        async deactivatePatient(id) {
-            if (!confirm('Are you sure you want to deactivate this patient?')) return;
+        async deletePatient(id) {
+            if (!confirm('Are you sure you want to delete this patient? This action cannot be undone.')) return;
             try {
-                await adminAPI.deactivatePatient(id);
-                window.appInstance.showSuccess('Patient deactivated');
+                await adminAPI.deletePatient(id);
+                window.appInstance.showSuccess('Patient deleted');
                 await this.loadPatients();
             } catch (error) {
-                window.appInstance.showError('Failed to deactivate patient');
+                window.appInstance.showError('Failed to delete patient');
             }
         },
         viewHistory(id) {
@@ -472,7 +472,7 @@ const AdminPatients = {
                             <td>{{ patient.email }}</td>
                             <td>
                                 <button @click="viewHistory(patient.id)" class="btn btn-sm btn-info me-2">View History</button>
-                                <button @click="deactivatePatient(patient.id)" class="btn btn-sm btn-danger">Deactivate</button>
+                                <button @click="deletePatient(patient.id)" class="btn btn-sm btn-danger">Delete</button>
                             </td>
                         </tr>
                     </tbody>

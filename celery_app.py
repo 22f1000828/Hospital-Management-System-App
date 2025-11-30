@@ -21,11 +21,11 @@ def make_celery(app):
         beat_schedule={
             'daily-reminders': {
                 'task': 'app.tasks.send_daily_reminders',
-                'schedule': crontab(hour=20, minute=13),
+                'schedule': crontab(hour=21, minute=23),
             },
             'monthly-reports': {
                 'task': 'app.tasks.generate_monthly_reports_for_all_users',
-                'schedule': crontab(day_of_month=30, hour=20, minute=13),
+                'schedule': crontab(day_of_month=30, hour=21, minute=23),
             },
         },
     )
