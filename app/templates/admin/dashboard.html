@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Hospital Management System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h3>{{ total_patients }}</h3>
+            <p class="mb-0">Total Patients</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <h3>{{ total_doctors }}</h3>
+            <p class="mb-0">Total Doctors</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <h3>{{ total_appointments }}</h3>
+            <p class="mb-0">Total Appointments</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <h3>{{ upcoming_appointments }}</h3>
+            <p class="mb-0">Upcoming Appointments</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Appointments</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Doctor</th>
+                                <th>Patient</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in recent_appointments %}
+                            <tr>
+                                <td>{{ appointment.appointment_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ appointment.appointment_time.strftime('%H:%M') }}</td>
+                                <td>{{ appointment.doctor.full_name }}</td>
+                                <td>{{ appointment.patient.full_name }}</td>
+                                <td>
+                                    <span class="badge bg-{% if appointment.status == 'Booked' %}primary{% elif appointment.status == 'Completed' %}success{% else %}danger{% endif %}">
+                                        {{ appointment.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('admin.appointments') }}" class="btn btn-outline-primary">View All Appointments</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No recent appointments</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

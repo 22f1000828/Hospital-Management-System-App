@@ -1,0 +1,30 @@
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+WTForms==3.1.1
+Werkzeug==3.0.1
+email-validator==2.1.0
+python-dotenv==1.0.0
+
+# Celery and Redis for background jobs
+celery==5.3.4
+redis==5.0.1
+flower==2.0.1
+
+# Email support for reminders
+Flask-Mail==0.10.0
+
+# PDF generation for reports
+reportlab==4.0.7
+weasyprint==60.2
+
+# CSV export
+pandas==2.1.4
+
+# Caching
+Flask-Caching==2.1.0
+
+# Timezone support
+pytz==2024.1
+

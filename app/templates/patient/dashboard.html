@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Dashboard - Hospital Management System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Welcome, {{ patient.full_name }}</h2>
+
+<!-- Available Specializations/Departments -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-hospital me-2"></i>Available Specializations</h5>
+        <a href="{{ url_for('patient.doctors') }}" class="btn btn-sm btn-primary">Find Doctors</a>
+    </div>
+    <div class="card-body">
+        {% if departments %}
+        <div class="row">
+            {% for dept in departments %}
+            <div class="col-md-4 mb-2">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-heart-pulse text-primary me-2"></i>
+                    <div>
+                        <strong>{{ dept.name }}</strong>
+                        {% if dept.description %}
+                        <br><small class="text-muted">{{ dept.description }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted text-center mb-0">No specializations available</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Doctor Availability for Next 7 Days -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Doctors Available (Next 7 Days)</h5>
+        <a href="{{ url_for('patient.doctors') }}" class="btn btn-sm btn-primary">View All Doctors</a>
+    </div>
+    <div class="card-body">
+        {% if doctor_availability_summary %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th>Specialization</th>
+                        <th>Available Slots</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in doctor_availability_summary[:5] %}
+                    <tr>
+                        <td>{{ item.doctor.full_name }}</td>
+                        <td>{{ item.doctor.department.name if item.doctor.department else 'N/A' }}</td>
+                        <td><span class="badge bg-success">{{ item.available_slots }} slots</span></td>
+                        <td>
+                            <a href="{{ url_for('patient.book_appointment', doctor_id=item.doctor.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-calendar-plus"></i> Book
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if doctor_availability_summary|length > 5 %}
+        <div class="text-center mt-3">
+            <a href="{{ url_for('patient.doctors') }}" class="btn btn-outline-primary">View All Available Doctors</a>
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="text-muted text-center mb-0">No doctors available for the next 7 days</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Upcoming Appointments</h5>
+            </div>
+            <div class="card-body">
+                {% if upcoming_appointments %}
+                <div class="list-group">
+                    {% for appointment in upcoming_appointments %}
+                    <a href="{{ url_for('patient.appointment_detail', appointment_id=appointment.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ appointment.appointment_date.strftime('%B %d, %Y') }} at {{ appointment.appointment_time.strftime('%H:%M') }}</h6>
+                                <p class="mb-0 text-muted small">Dr. {{ appointment.doctor.full_name }} - {{ appointment.doctor.department.name if appointment.doctor.department else 'N/A' }}</p>
+                            </div>
+                            <span class="badge bg-primary">{{ appointment.status }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('patient.appointments') }}" class="btn btn-outline-primary">View All Appointments</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No upcoming appointments</p>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('patient.doctors') }}" class="btn btn-primary">Book an Appointment</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Appointments</h5>
+            </div>
+            <div class="card-body">
+                {% if past_appointments %}
+                <div class="list-group">
+                    {% for appointment in past_appointments %}
+                    <a href="{{ url_for('patient.appointment_detail', appointment_id=appointment.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ appointment.appointment_date.strftime('%B %d, %Y') }}</h6>
+                                <p class="mb-0 text-muted small">Dr. {{ appointment.doctor.full_name }}</p>
+                            </div>
+                            <span class="badge bg-{% if appointment.status == 'Completed' %}success{% else %}danger{% endif %}">
+                                {{ appointment.status }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('patient.history') }}" class="btn btn-outline-primary">View Full History</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No past appointments</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

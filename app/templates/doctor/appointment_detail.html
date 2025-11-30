@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment Details - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-calendar-check me-2"></i>Appointment Details</h2>
+    <a href="{{ url_for('doctor.appointments') }}" class="btn btn-secondary">Back</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Appointment Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Date:</strong> {{ appointment.appointment_date.strftime('%B %d, %Y') }}</p>
+                <p><strong>Time:</strong> {{ appointment.appointment_time.strftime('%H:%M') }}</p>
+                <p><strong>Patient:</strong> 
+                    <a href="{{ url_for('doctor.patient_history', patient_id=appointment.patient_id) }}">{{ appointment.patient.full_name }}</a>
+                </p>
+                <p><strong>Reason:</strong> {{ appointment.reason or 'N/A' }}</p>
+                <p><strong>Status:</strong> 
+                    <span class="badge bg-{% if appointment.status == 'Booked' %}primary{% elif appointment.status == 'Completed' %}success{% else %}danger{% endif %}">
+                        {{ appointment.status }}
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Update Status</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ status_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ status_form.status.label(class="form-label") }}
+                        {{ status_form.status(class="form-select") }}
+                    </div>
+                    {{ status_form.submit_status(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Treatment Details</h5>
+            </div>
+            <div class="card-body">
+                {% if treatment %}
+                <div class="mb-3">
+                    <strong>Diagnosis:</strong>
+                    <p>{{ treatment.diagnosis }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Prescription:</strong>
+                    <p>{{ treatment.prescription or 'N/A' }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Notes:</strong>
+                    <p>{{ treatment.notes or 'N/A' }}</p>
+                </div>
+                <hr>
+                {% endif %}
+                
+                <form method="POST">
+                    {{ treatment_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ treatment_form.diagnosis.label(class="form-label") }}
+                        {{ treatment_form.diagnosis(class="form-control", rows="3") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ treatment_form.prescription.label(class="form-label") }}
+                        {{ treatment_form.prescription(class="form-control", rows="3") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ treatment_form.notes.label(class="form-label") }}
+                        {{ treatment_form.notes(class="form-control", rows="3") }}
+                    </div>
+                    {{ treatment_form.submit_treatment(class="btn btn-success") }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

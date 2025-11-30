@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">{{ title }}</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control") }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control") }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small">{{ form.email.errors[0] }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control", type="password", placeholder="Leave blank to keep current password") }}
+                {% if form.password.errors %}
+                    <div class="text-danger small">{{ form.password.errors[0] }}</div>
+                {% endif %}
+                <small class="text-muted">If left blank and editing, password will remain unchanged. If creating new, default is 'doctor123'</small>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.first_name.label(class="form-label") }}
+                    {{ form.first_name(class="form-control") }}
+                    {% if form.first_name.errors %}
+                        <div class="text-danger small">{{ form.first_name.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.last_name.label(class="form-label") }}
+                    {{ form.last_name(class="form-control") }}
+                    {% if form.last_name.errors %}
+                        <div class="text-danger small">{{ form.last_name.errors[0] }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.specialization_id.label(class="form-label") }}
+                    {{ form.specialization_id(class="form-select") }}
+                    {% if form.specialization_id.errors %}
+                        <div class="text-danger small">{{ form.specialization_id.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(class="form-control") }}
+                    {% if form.phone.errors %}
+                        <div class="text-danger small">{{ form.phone.errors[0] }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form.license_number.label(class="form-label") }}
+                {{ form.license_number(class="form-control") }}
+                {% if form.license_number.errors %}
+                    <div class="text-danger small">{{ form.license_number.errors[0] }}</div>
+                {% endif %}
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('admin.doctors') }}" class="btn btn-secondary">Cancel</a>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
