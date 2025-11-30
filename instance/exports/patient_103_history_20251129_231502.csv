@@ -1,5 +1,0 @@
-Appointment Date,Appointment Time,Doctor,Specialization,Status,Reason,Diagnosis,Prescription,Notes,Treatment Date
-2025-11-26,10:30,Emily Brown,Cardiology,Booked,heart,N/A,N/A,N/A,N/A
-2025-11-25,09:00,James Wilson,Orthopedics,Cancelled,na,N/A,N/A,N/A,N/A
-2025-11-24,16:00,John Smith,Cardiology,Cancelled,nope,N/A,N/A,N/A,N/A
-2025-11-24,11:00,doctor 2,Neurology,Booked,NA,N/A,N/A,N/A,N/A

@@ -522,61 +522,60 @@ Hospital Management System
     @celery_app.task(bind=True, name='app.tasks.export_patient_history_csv')
     def export_patient_history_csv(self, patient_id):
         try:
+            current_app.logger.info(f"Starting export for patient {patient_id}")
             patient = Patient.query.get_or_404(patient_id)
             user = patient.user
             
             appointments = Appointment.query.filter_by(
                 patient_id=patient_id
+            ).options(
+                joinedload(Appointment.doctor).joinedload(Doctor.department),
+                joinedload(Appointment.treatment)
             ).order_by(
                 Appointment.appointment_date.desc(),
                 Appointment.appointment_time.desc()
             ).all()
             
+            current_app.logger.info(f"Found {len(appointments)} appointments for patient {patient_id}")
+            
             csv_data = []
             for appointment in appointments:
                 treatment = appointment.treatment
+                doctor_name = appointment.doctor.full_name if appointment.doctor else 'N/A'
+                specialization = appointment.doctor.department.name if (appointment.doctor and appointment.doctor.department) else 'N/A'
                 csv_data.append({
-                    'Appointment Date': appointment.appointment_date.strftime('%Y-%m-%d'),
-                    'Appointment Time': appointment.appointment_time.strftime('%H:%M'),
-                    'Doctor': appointment.doctor.full_name,
-                    'Specialization': appointment.doctor.department.name if appointment.doctor.department else 'N/A',
-                    'Status': appointment.status,
+                    'Appointment Date': appointment.appointment_date.strftime('%Y-%m-%d') if appointment.appointment_date else 'N/A',
+                    'Appointment Time': appointment.appointment_time.strftime('%H:%M') if appointment.appointment_time else 'N/A',
+                    'Doctor': doctor_name,
+                    'Specialization': specialization,
+                    'Status': appointment.status or 'N/A',
                     'Reason': appointment.reason or 'N/A',
                     'Diagnosis': treatment.diagnosis if treatment else 'N/A',
                     'Prescription': treatment.prescription if treatment else 'N/A',
                     'Notes': treatment.notes if treatment else 'N/A',
-                    'Treatment Date': treatment.created_at.strftime('%Y-%m-%d %H:%M') if treatment else 'N/A'
+                    'Treatment Date': treatment.created_at.strftime('%Y-%m-%d %H:%M') if (treatment and treatment.created_at) else 'N/A'
                 })
             
             exports_dir = os.path.join(current_app.instance_path, 'exports')
             os.makedirs(exports_dir, exist_ok=True)
+            current_app.logger.info(f"Export directory: {exports_dir}")
             
             timestamp = get_ist_now().strftime('%Y%m%d_%H%M%S')
             csv_filename = f"patient_{patient_id}_history_{timestamp}.csv"
             csv_path = os.path.join(exports_dir, csv_filename)
             
+            current_app.logger.info(f"Creating CSV file: {csv_path}")
             df = pd.DataFrame(csv_data)
             df.to_csv(csv_path, index=False)
+            current_app.logger.info(f"CSV file created successfully: {csv_path}, size: {os.path.getsize(csv_path)} bytes")
             
             if user.email:
                 try:
-                    from flask import url_for
-                    with current_app.app_context():
-                        base_url = current_app.config.get('BASE_URL', 'http://localhost:5000')
-                        original_server_name = current_app.config.get('SERVER_NAME')
-                        
-                        from urllib.parse import urlparse
-                        parsed_url = urlparse(base_url)
-                        if parsed_url.netloc:
-                            current_app.config['SERVER_NAME'] = parsed_url.netloc
-                        
-                        try:
-                            download_url = url_for('patient.download_export', filename=csv_filename, _external=True)
-                        finally:
-                            if original_server_name:
-                                current_app.config['SERVER_NAME'] = original_server_name
-                            elif 'SERVER_NAME' in current_app.config:
-                                del current_app.config['SERVER_NAME']
+                    import hashlib
+                    base_url = current_app.config.get('BASE_URL', 'http://127.0.0.1:5000')
+                    secret_key = current_app.config.get('SECRET_KEY')
+                    token = hashlib.sha256(f"{secret_key}{csv_filename}{patient_id}".encode()).hexdigest()
+                    download_url = f"{base_url}/api/patient/exports/{csv_filename}?token={token}"
                     
                     email_body = f"""
 Dear {patient.full_name},
@@ -585,8 +584,6 @@ Your treatment history export has been completed.
 
 You can download your CSV file by clicking the link below:
 {download_url}
-
-Note: You will need to be logged in to your account to download the file. If you are not logged in, you will be redirected to the login page first.
 
 The file contains {len(csv_data)} appointment records.
 
@@ -614,7 +611,8 @@ Hospital Management System
             }
         
         except Exception as e:
-            current_app.logger.error(f"CSV export failed: {str(e)}")
+            current_app.logger.error(f"CSV export failed for patient {patient_id}: {str(e)}")
+            current_app.logger.exception(e)
             raise
     
     return {

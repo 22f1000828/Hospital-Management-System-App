@@ -1,5 +1,0 @@
-Appointment Date,Appointment Time,Doctor,Specialization,Status,Reason,Diagnosis,Prescription,Notes,Treatment Date
-2025-11-25,09:45,John Smith,Cardiology,Booked,routine,N/A,N/A,N/A,N/A
-2025-11-17,14:00,Emily Brown,Cardiology,Booked,Mini Heart attack ,N/A,N/A,N/A,N/A
-2025-11-08,05:30,John Smith,Cardiology,Completed,N/A,d2,p2,n2,2025-11-24 12:38
-2025-11-05,04:48,doctor 2,Neurology,Cancelled,no reason,N/A,N/A,N/A,N/A

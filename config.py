@@ -6,7 +6,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///instance/hospital.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    WTF_CSRF_ENABLED = True
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
     
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
@@ -31,5 +30,6 @@ class Config:
     CACHE_REDIS_URL = os.environ.get('CACHE_REDIS_URL') or 'redis://localhost:6379/1'
     CACHE_DEFAULT_TIMEOUT = 300
     
-    BASE_URL = os.environ.get('BASE_URL') or 'http://localhost:5000'
+    BASE_URL = os.environ.get('BASE_URL') or 'http://127.0.0.1:5000'
+    SERVER_NAME = None  # set to None to avoid issues
 

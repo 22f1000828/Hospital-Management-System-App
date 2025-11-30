@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 
 class User(UserMixin, db.Model):
-    """User model with role-based access"""
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -20,18 +19,15 @@ class User(UserMixin, db.Model):
     patient_profile = db.relationship('Patient', backref='user', uselist=False, cascade='all, delete-orphan')
     
     def set_password(self, password):
-        """Hash and set password"""
         self.password_hash = generate_password_hash(password)
     
     def check_password(self, password):
-        """Verify password"""
         return check_password_hash(self.password_hash, password)
     
     def __repr__(self):
         return f'<User {self.username} ({self.role})>'
 
 class Department(db.Model):
-    """Department/Specialization model"""
     __tablename__ = 'departments'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -44,7 +40,6 @@ class Department(db.Model):
         return f'<Department {self.name}>'
 
 class Doctor(db.Model):
-    """Doctor model with specialization and availability"""
     __tablename__ = 'doctors'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -68,7 +63,6 @@ class Doctor(db.Model):
         return f'<Doctor {self.full_name}>'
 
 class DoctorAvailability(db.Model):
-    """Doctor availability for next 7 days"""
     __tablename__ = 'doctor_availabilities'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -84,7 +78,6 @@ class DoctorAvailability(db.Model):
         return f'<DoctorAvailability {self.doctor_id} - {self.date} {self.start_time}>'
 
 class Patient(db.Model):
-    """Patient model with profile and contact information"""
     __tablename__ = 'patients'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -117,7 +110,6 @@ class Patient(db.Model):
         return f'<Patient {self.full_name}>'
 
 class Appointment(db.Model):
-    """Appointment model linking doctors and patients"""
     __tablename__ = 'appointments'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -138,7 +130,6 @@ class Appointment(db.Model):
         return f'<Appointment {self.id} - {self.appointment_date} {self.appointment_time}>'
 
 class Treatment(db.Model):
-    """Treatment model for diagnosis, prescription, and notes"""
     __tablename__ = 'treatments'
     
     id = db.Column(db.Integer, primary_key=True)

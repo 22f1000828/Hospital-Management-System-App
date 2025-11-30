@@ -3,6 +3,5 @@ from app.main import bp
 
 @bp.route('/')
 def index():
-    """Home page"""
-    return render_template('main/index.html')
+    return render_template('index.html')
 
