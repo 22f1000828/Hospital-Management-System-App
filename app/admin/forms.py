@@ -17,21 +17,16 @@ class DoctorForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(DoctorForm, self).__init__(*args, **kwargs)
-        # Choices will be populated in the route where app context is available
         self.specialization_id.choices = []
     
     def validate_username(self, username):
-        # Check if updating existing doctor or creating new
         doctor_id = getattr(self, 'doctor_id', None)
         user = User.query.filter_by(username=username.data).first()
         if user:
-            # Check if this is a new doctor form (no doctor_id) or editing existing
             if not doctor_id:
-                # New doctor - username should not exist
                 if user:
                     raise ValidationError('Username already exists.')
             else:
-                # Editing existing doctor - check if username belongs to different user
                 if user.doctor_profile is None or user.doctor_profile.id != doctor_id:
                     raise ValidationError('Username already exists.')
     
@@ -39,13 +34,10 @@ class DoctorForm(FlaskForm):
         doctor_id = getattr(self, 'doctor_id', None)
         user = User.query.filter_by(email=email.data).first()
         if user:
-            # Check if this is a new doctor form (no doctor_id) or editing existing
             if not doctor_id:
-                # New doctor - email should not exist
                 if user:
                     raise ValidationError('Email already exists.')
             else:
-                # Editing existing doctor - check if email belongs to different user
                 if user.doctor_profile is None or user.doctor_profile.id != doctor_id:
                     raise ValidationError('Email already exists.')
 
@@ -66,7 +58,6 @@ class DoctorSearchForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(DoctorSearchForm, self).__init__(*args, **kwargs)
-        # Choices will be populated in the route where app context is available
         self.specialization_id.choices = [('', 'All')]
 
 class AppointmentSearchForm(FlaskForm):

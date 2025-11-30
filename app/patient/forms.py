@@ -35,6 +35,5 @@ class DoctorSearchForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(DoctorSearchForm, self).__init__(*args, **kwargs)
-        # Choices are populated in-route where app context and departments exist
         self.specialization_id.choices = [('', 'All')]
 

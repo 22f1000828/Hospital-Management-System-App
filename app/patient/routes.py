@@ -27,7 +27,6 @@ def dashboard():
     try:
         patient = Patient.query.filter_by(user_id=current_user.id).first_or_404()
         
-        # Upcoming appointments - eagerly load doctor and department relationships
         upcoming_appointments = Appointment.query.filter_by(
             patient_id=patient.id,
             status='Booked'
@@ -38,7 +37,6 @@ def dashboard():
             joinedload(Appointment.doctor).joinedload(Doctor.user)
         ).order_by(Appointment.appointment_date, Appointment.appointment_time).all()
         
-        # Past appointments - eagerly load doctor and department relationships
         past_appointments = Appointment.query.filter_by(
             patient_id=patient.id
         ).filter(
@@ -49,14 +47,11 @@ def dashboard():
             joinedload(Appointment.doctor).joinedload(Doctor.user)
         ).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).limit(10).all()
         
-        # All available specializations/departments
         departments = Department.query.order_by(Department.name).all()
         
-        # Doctors with availability for next 7 days
         today = date.today()
         next_7_days = today + timedelta(days=7)
         
-        # Eagerly load doctor relationships
         available_doctors = Doctor.query.filter_by(is_active=True).options(
             joinedload(Doctor.department),
             joinedload(Doctor.user)
@@ -87,7 +82,6 @@ def dashboard():
     except Exception as e:
         flash(f'Error loading dashboard: {str(e)}', 'danger')
         current_app.logger.error(f'Error in patient dashboard: {str(e)}', exc_info=True)
-        # Return minimal dashboard on error
         patient = Patient.query.filter_by(user_id=current_user.id).first_or_404()
         return render_template('patient/dashboard.html',
                              patient=patient,
@@ -130,23 +124,19 @@ def doctors():
     """Search and view doctors"""
     try:
         form = DoctorSearchForm()
-        # Ensure choices are populated
         departments = Department.query.order_by(Department.name).all()
         form.specialization_id.choices = [('', 'All')] + [(d.id, d.name) for d in departments]
         
-        # Get search parameters
         query = form.search_query.data if form.validate_on_submit() else request.args.get('query', '')
         specialization_id = form.specialization_id.data if form.validate_on_submit() else request.args.get('specialization_id', type=int)
         if specialization_id == '':
             specialization_id = None
         
-        # Eagerly load user and department relationships to avoid N+1 queries
         doctors_query = Doctor.query.filter_by(is_active=True).options(
             joinedload(Doctor.user),
             joinedload(Doctor.department)
         )
         
-        # Apply search filters
         if query:
             doctors_query = doctors_query.join(User).filter(
                 (Doctor.first_name.contains(query)) |
@@ -156,7 +146,6 @@ def doctors():
         
         doctors_list = doctors_query.all()
         
-        # Filter by specialization if specified
         if specialization_id is not None:
             doctors_list = [d for d in doctors_list if d.specialization_id == specialization_id]
         
@@ -164,7 +153,6 @@ def doctors():
     except Exception as e:
         flash(f'Error loading doctors: {str(e)}', 'danger')
         current_app.logger.error(f'Error in doctors route: {str(e)}', exc_info=True)
-        # Return empty list on error
         return render_template('patient/doctors.html', doctors=[], form=form)
 
 @bp.route('/doctors/<int:doctor_id>/book', methods=['GET', 'POST'])
@@ -181,7 +169,6 @@ def book_appointment(doctor_id):
     form = AppointmentBookingForm()
     form.doctor_id.data = doctor_id
     
-    # Determine selected date without overriding POSTed data
     selected_date = form.appointment_date.data
     if request.method == 'GET':
         selected_date_str = request.args.get('date')
@@ -194,7 +181,6 @@ def book_appointment(doctor_id):
             selected_date = date.today()
         form.appointment_date.data = selected_date
     
-    # Get available time slots for the selected date
     available_times = []
     if selected_date:
         cache_key = f'doctor_{doctor_id}_availability_{selected_date}'
@@ -247,7 +233,6 @@ def book_appointment(doctor_id):
             flash('Invalid doctor selection', 'danger')
             return redirect(url_for('patient.book_appointment', doctor_id=doctor_id))
         
-        # Check for double booking
         appointment_time_obj = datetime.strptime(form.appointment_time.data, '%H:%M').time()
         existing = Appointment.query.filter_by(
             doctor_id=doctor_id,
@@ -260,12 +245,10 @@ def book_appointment(doctor_id):
             flash('This time slot is already booked. Please choose another time.', 'danger')
             return redirect(url_for('patient.book_appointment', doctor_id=doctor_id))
         
-        # Check if date is in the past
         if form.appointment_date.data < date.today():
             flash('Cannot book appointments in the past', 'danger')
             return redirect(url_for('patient.book_appointment', doctor_id=doctor_id))
         
-        # Create appointment
         appointment = Appointment(
             doctor_id=doctor_id,
             patient_id=patient.id,
@@ -277,12 +260,10 @@ def book_appointment(doctor_id):
         db.session.add(appointment)
         db.session.commit()
         
-        # Invalidate cache for doctor availability and appointments
         cache_key = f'doctor_{doctor_id}_appointments_{form.appointment_date.data}'
         cache.delete(cache_key)
         cache_key_avail = f'doctor_{doctor_id}_availability_{form.appointment_date.data}'
         cache.delete(cache_key_avail)
-        # Also invalidate dashboard cache
         cache.delete('patient_dashboard')
         
         flash('Appointment booked successfully', 'success')
@@ -351,7 +332,6 @@ def cancel_appointment(appointment_id):
     appointment.updated_at = datetime.utcnow()
     db.session.commit()
     
-    # Invalidate cache
     cache_key = f'doctor_{appointment.doctor_id}_appointments_{appointment.appointment_date}'
     cache.delete(cache_key)
     cache.delete('patient_dashboard')
@@ -424,7 +404,6 @@ def reschedule_appointment(appointment_id):
         form.appointment_time.choices = []
     
     if form.validate_on_submit():
-        # Check for conflicts
         existing = Appointment.query.filter(
             Appointment.doctor_id == appointment.doctor_id,
             Appointment.appointment_date == form.appointment_date.data,
@@ -444,7 +423,6 @@ def reschedule_appointment(appointment_id):
         appointment.updated_at = datetime.utcnow()
         db.session.commit()
         
-        # Invalidate cache
         cache_key = f'doctor_{appointment.doctor_id}_appointments_{form.appointment_date.data}'
         cache.delete(cache_key)
         cache.delete('patient_dashboard')
@@ -479,7 +457,6 @@ def export_history():
     try:
         from celery_app import celery
         
-        # Trigger async CSV export using task name
         task = celery.send_task('app.tasks.export_patient_history_csv', args=[patient.id])
         
         flash('Export started. You will receive an email when it is ready.', 'info')
@@ -498,15 +475,12 @@ def export_history():
 @bp.route('/exports/<filename>')
 @patient_required
 def download_export(filename):
-    """Download exported CSV file"""
     patient = Patient.query.filter_by(user_id=current_user.id).first_or_404()
     
-    # Verify filename belongs to this patient
     if not filename.startswith(f'patient_{patient.id}_'):
         flash('Access denied', 'danger')
         return redirect(url_for('patient.history'))
     
-    # Get file path
     from flask import current_app
     exports_dir = os.path.join(current_app.instance_path, 'exports')
     file_path = os.path.join(exports_dir, filename)

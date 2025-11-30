@@ -8,7 +8,6 @@ from app.utils import get_ist_now
 import os
 import pandas as pd
 
-# Tasks will be registered after celery is created
 def register_tasks(celery_app):
     @celery_app.task(bind=True, name='app.tasks.send_daily_reminders')
     def send_daily_reminders(self):
@@ -533,7 +532,6 @@ Hospital Management System
                 Appointment.appointment_time.desc()
             ).all()
             
-            # Prepare data for CSV
             csv_data = []
             for appointment in appointments:
                 treatment = appointment.treatment
@@ -557,20 +555,16 @@ Hospital Management System
             csv_filename = f"patient_{patient_id}_history_{timestamp}.csv"
             csv_path = os.path.join(exports_dir, csv_filename)
             
-            # Write CSV using pandas
             df = pd.DataFrame(csv_data)
             df.to_csv(csv_path, index=False)
             
             if user.email:
                 try:
-                    # Generate proper URL using Flask's url_for
                     from flask import url_for
                     with current_app.app_context():
-                        # Set SERVER_NAME temporarily if BASE_URL is configured
                         base_url = current_app.config.get('BASE_URL', 'http://localhost:5000')
                         original_server_name = current_app.config.get('SERVER_NAME')
                         
-                        # Extract host from BASE_URL for SERVER_NAME
                         from urllib.parse import urlparse
                         parsed_url = urlparse(base_url)
                         if parsed_url.netloc:
@@ -579,7 +573,6 @@ Hospital Management System
                         try:
                             download_url = url_for('patient.download_export', filename=csv_filename, _external=True)
                         finally:
-                            # Restore original SERVER_NAME
                             if original_server_name:
                                 current_app.config['SERVER_NAME'] = original_server_name
                             elif 'SERVER_NAME' in current_app.config:

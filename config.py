@@ -31,6 +31,5 @@ class Config:
     CACHE_REDIS_URL = os.environ.get('CACHE_REDIS_URL') or 'redis://localhost:6379/1'
     CACHE_DEFAULT_TIMEOUT = 300
     
-    # Base URL for generating absolute URLs in emails
     BASE_URL = os.environ.get('BASE_URL') or 'http://localhost:5000'
 

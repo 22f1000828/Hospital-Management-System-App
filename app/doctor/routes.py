@@ -24,7 +24,6 @@ def dashboard():
     """Doctor dashboard with upcoming appointments"""
     doctor = Doctor.query.filter_by(user_id=current_user.id).first_or_404()
     
-    # Today's appointments
     today = date.today()
     today_appointments = Appointment.query.filter_by(
         doctor_id=doctor.id,
@@ -145,7 +144,6 @@ def patients():
     """View list of assigned patients"""
     doctor = Doctor.query.filter_by(user_id=current_user.id).first_or_404()
     
-    # Get unique patients
     patient_ids = db.session.query(Appointment.patient_id).filter_by(
         doctor_id=doctor.id
     ).distinct().all()
@@ -161,7 +159,6 @@ def patient_history(patient_id):
     doctor = Doctor.query.filter_by(user_id=current_user.id).first_or_404()
     patient = Patient.query.get_or_404(patient_id)
     
-    # Get all appointments for this patient with this doctor
     appointments = Appointment.query.filter_by(
         doctor_id=doctor.id,
         patient_id=patient_id
@@ -182,7 +179,6 @@ def availability():
     doctor = Doctor.query.filter_by(user_id=current_user.id).first_or_404()
     form = AvailabilityForm()
     
-    # Get current availability
     today = date.today()
     next_7_days = today + timedelta(days=7)
     availabilities = DoctorAvailability.query.filter(

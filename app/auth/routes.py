@@ -22,7 +22,6 @@ def handle_login(form, expected_role, dashboard_route):
                 flash('Your account has been deactivated. Please contact admin.', 'danger')
                 return redirect(url_for(f'auth.{expected_role.lower()}_login'))
             
-            # Check if user role matches expected role
             if user.role != expected_role:
                 flash(f'Invalid login page. Please use the {user.role.lower()} login page.', 'danger')
                 return redirect(url_for(f'auth.{user.role.lower()}_login'))
@@ -93,7 +92,7 @@ def register():
         )
         user.set_password(form.password.data)
         db.session.add(user)
-        db.session.flush()  # To get user.id
+        db.session.flush()
         
         # Create patient profile
         patient = Patient(

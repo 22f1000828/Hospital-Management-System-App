@@ -51,7 +51,6 @@ def dashboard():
 def doctors():
     """View and manage doctors"""
     form = DoctorSearchForm()
-    # Populate specialization choices
     departments = Department.query.order_by(Department.name).all()
     form.specialization_id.choices = [('', 'All')] + [(d.id, d.name) for d in departments]
     
@@ -84,7 +83,6 @@ def add_doctor():
     """Add new doctor"""
     form = DoctorForm()
     
-    # Ensure specialization choices are populated
     if not form.specialization_id.choices:
         departments = Department.query.order_by(Department.name).all()
         form.specialization_id.choices = [(d.id, d.name) for d in departments]
@@ -137,13 +135,11 @@ def edit_doctor(doctor_id):
     form = DoctorForm(obj=doctor.user)
     form.doctor_id = doctor_id
     
-    # Ensure specialization choices are populated
     if not form.specialization_id.choices:
         departments = Department.query.order_by(Department.name).all()
         form.specialization_id.choices = [(d.id, d.name) for d in departments]
     
     if request.method == 'GET':
-        # Populate form with doctor data for initial load
         form.first_name.data = doctor.first_name
         form.last_name.data = doctor.last_name
         form.specialization_id.data = doctor.specialization_id
@@ -185,7 +181,6 @@ def patients():
     """View and manage patients - with caching"""
     form = PatientSearchForm()
     
-    # Get search query
     query = form.search_query.data if form.validate_on_submit() else request.args.get('query', '')
     
     # Create cache key

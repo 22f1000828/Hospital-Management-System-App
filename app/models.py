@@ -16,7 +16,6 @@ class User(UserMixin, db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
     doctor_profile = db.relationship('Doctor', backref='user', uselist=False, cascade='all, delete-orphan')
     patient_profile = db.relationship('Patient', backref='user', uselist=False, cascade='all, delete-orphan')
     
@@ -39,7 +38,6 @@ class Department(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.Text)
     
-    # Relationships
     doctors = db.relationship('Doctor', backref='department', lazy='dynamic')
     
     def __repr__(self):
@@ -59,7 +57,6 @@ class Doctor(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
     appointments = db.relationship('Appointment', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
     availabilities = db.relationship('DoctorAvailability', backref='doctor', lazy='dynamic', cascade='all, delete-orphan')
     
@@ -103,7 +100,6 @@ class Patient(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
     appointments = db.relationship('Appointment', backref='patient', lazy='dynamic', cascade='all, delete-orphan')
     
     @property
@@ -134,7 +130,6 @@ class Appointment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
     treatment = db.relationship('Treatment', backref='appointment', uselist=False, cascade='all, delete-orphan')
     
     db.UniqueConstraint('doctor_id', 'appointment_date', 'appointment_time', name='unique_doctor_appointment')
